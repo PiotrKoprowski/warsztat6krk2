@@ -3,6 +3,7 @@
     pageEncoding="UTF-8"%>
 
 <p class="main-menu">
+	<p>${loggedInUser.username}</p>
 	<a href="${pageContext.servletContext.contextPath}/user/login/">Login</a>
 	<a href="${pageContext.servletContext.contextPath}/user/register/">Register</a>
 </p>
