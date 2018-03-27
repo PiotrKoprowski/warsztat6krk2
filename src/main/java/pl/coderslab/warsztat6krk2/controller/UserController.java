@@ -1,5 +1,6 @@
 package pl.coderslab.warsztat6krk2.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import pl.coderslab.warsztat6krk2.entity.User;
 import pl.coderslab.warsztat6krk2.model.UserDTO;
@@ -20,7 +22,6 @@ import pl.coderslab.warsztat6krk2.repository.UserRepository;
 @RequestMapping("/user")
 @SessionAttributes({"loggedInUser"})
 public class UserController {
-	
 	@Autowired
 	UserRepository userRepository;
 	
@@ -33,7 +34,8 @@ public class UserController {
 	@PostMapping("/register")
 	public String registerPost(@Valid @ModelAttribute User user, BindingResult br) {
 		this.userRepository.save(user);
-		return "redirect:/login";
+		
+		return "redirect:/user/login";
 	}
 	
 	@GetMapping("/login")
@@ -43,12 +45,21 @@ public class UserController {
 	}
 	
 	@PostMapping("/login")
-	public String loginPost(@Valid @ModelAttribute UserDTO user, BindingResult br, Model model) {
+	public String loginPost(@Valid @ModelAttribute UserDTO user, BindingResult br, Model m, HttpServletRequest r) {
 		User u = this.userRepository.findOneByEmail(user.getEmail());
-		if(u!=null && u.isPasswordCorrect(user.getPassword())) {
-			model.addAttribute("loggedInUser", u);
+		if(u != null && u.isPasswordCorrect(user.getPassword())) {
+			m.addAttribute("loggedInUser", u);
 			return "redirect:/";
 		}
-		return "redirect: /login";
+//		m.addAttribute("alert", "Błędny login lub hasło spróbuj jeszcze raz!");
+//		r.setAttribute("alert", "Błędny login lub hasło spróbuj jeszcze raz!");
+		return "redirect:/user/login";
+	}
+	
+	@GetMapping("/logout")
+	public String logout(SessionStatus status) {
+		status.setComplete();
+		
+		return "redirect:/";
 	}
 }
